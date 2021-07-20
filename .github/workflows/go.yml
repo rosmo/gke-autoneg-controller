@@ -1,0 +1,49 @@
+name: |
+  Build, test, release
+on:
+  push:
+    branches: 
+    - master
+  pull_request:
+    branches: 
+    - master 
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Test
+      run: |
+        sudo mkdir -p /usr/local/kubebuilder
+        curl -Ls https://github.com/kubernetes-sigs/kubebuilder/releases/download/v2.3.2/kubebuilder_2.3.2_linux_amd64.tar.gz | sudo tar -xvz --strip-components=1 -C /usr/local/kubebuilder -f - 
+        make test
+
+    - name: Build image for master
+      if: github.ref == 'refs/heads/master'
+      run: |
+        docker build -t gchr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:latest .
+        
+    - name: Push image for master
+      if: github.ref == 'refs/heads/master'
+      run: |
+        docker push gchr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:latest
+    
+    - name: Build image for PR
+      if: github.ref != 'refs/heads/master'
+      run: |
+        PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+        docker build -t gchr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:pr-$PR_NUMBER .
+        
+    - name: Push image for PR
+      if: github.ref != 'refs/heads/master'
+      run: |
+        PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+        docker push gchr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:pr-$PR_NUMBER
