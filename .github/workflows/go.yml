@@ -1,5 +1,6 @@
 name: |
-  Build, test, release
+  Build, test, push
+
 on:
   push:
     branches: 
@@ -7,6 +8,10 @@ on:
   pull_request:
     branches: 
     - master 
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
 
