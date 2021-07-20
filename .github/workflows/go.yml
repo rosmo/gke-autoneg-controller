@@ -29,21 +29,21 @@ jobs:
     - name: Build image for master
       if: github.ref == 'refs/heads/master'
       run: |
-        docker build -t gchr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:latest .
+        docker build -t ghcr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:latest .
         
     - name: Push image for master
       if: github.ref == 'refs/heads/master'
       run: |
-        docker push gchr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:latest
+        docker push ghcr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:latest
     
     - name: Build image for PR
       if: github.ref != 'refs/heads/master'
       run: |
         PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
-        docker build -t gchr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:pr-$PR_NUMBER .
+        docker build -t ghcr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:pr-$PR_NUMBER .
         
     - name: Push image for PR
       if: github.ref != 'refs/heads/master'
       run: |
         PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
-        docker push gchr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:pr-$PR_NUMBER
+        docker push ghcr.io/$GITHUB_REPOSITORY/gke-autoneg-controller:pr-$PR_NUMBER
